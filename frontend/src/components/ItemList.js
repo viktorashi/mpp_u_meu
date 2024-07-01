@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import {
   Container,
@@ -200,7 +201,12 @@ const ItemList = () => {
             style={{ marginBottom: "10px" }}
           >
             <ListItem>
-              <ListItemText primary={item.name} secondary={item.description} />
+              <Link to={`/details/${item.number}`}>
+                <ListItemText
+                  primary={item.name}
+                  secondary={item.description}
+                />
+              </Link>
               <IconButton
                 edge="end"
                 aria-label="edit"
