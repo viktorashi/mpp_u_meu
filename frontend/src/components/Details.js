@@ -33,15 +33,24 @@ function DetailsPage() {
   //display them
   return (
     <div>
-      <h2>Details for Page {number}</h2>
-      <p>{details.description}</p>
-      <p>{details.category}</p>
-      <p>{details.appearance}</p>
-      <p>{details.discovered_by}</p>
-      <p>{details.named_by}</p>
-      <p>{details.phase}</p>
-      <img src={details.bohr_model_image} alt="Bohr Model" />
+      <h2>Details for {details.name}</h2>
       <p>{details.summary}</p>
+      <h2>Symbol</h2>
+      <p>{details.symbol}</p>
+      <h2>Atomic number</h2>
+      <p>{details.atomic_number}</p>
+      <h2>Category</h2>
+      <p>{details.category}</p>
+      <h2>Appearance</h2>
+      <p>{details.appearance}</p>
+      <h2>Discovered by</h2>
+      <p>{details.discovered_by}</p>
+      <h2>Named by</h2>
+      <p>{details.named_by}</p>
+      <h2>Phase</h2>
+      <p>{details.phase}</p>
+      <h2>Bohr model image</h2>
+      <img src={details.bohr_model_image} alt="Bohr Model" />
     </div>
   );
 }

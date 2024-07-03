@@ -29,6 +29,9 @@ __pycache__
 backend/__pycache__
 
 instance/
+idea/
+.idea/
+
 
 .pytest_cache/
 .coverage

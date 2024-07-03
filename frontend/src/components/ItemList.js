@@ -18,7 +18,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 const ItemList = () => {
   const [items, setItems] = useState([]);
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [editId, setEditId] = useState(0);
   const [category, setCategory] = useState("");
   const [appearance, setAppearance] = useState("");
@@ -27,13 +26,15 @@ const ItemList = () => {
   const [phase, setPhase] = useState("");
   const [bohr_model_image, setbohr_model_image] = useState("");
   const [summary, setSummary] = useState("");
+  const [symbol, setSymbol] = useState("");
+  const [atomic_number, setAtomic_number] = useState(0);
 
   useEffect(() => {
     fetchItems();
   }, []);
 
   const fetchItems = async () => {
-    const response = await axios.get("http://127.0.0.1:5000/items");
+    const response = await axios.get("http://127.0.0.1:5000/elements");
     console.log(response.data);
     setItems(response.data);
   };
@@ -41,7 +42,6 @@ const ItemList = () => {
   const resetFields = () => {
     setEditId(0);
     setName("");
-    setDescription("");
     setCategory("");
     setAppearance("");
     setDiscovered_by("");
@@ -49,44 +49,70 @@ const ItemList = () => {
     setPhase("");
     setbohr_model_image("");
     setSummary("");
+    setAtomic_number(0);
+    setSymbol("");
   };
 
   const addItem = async () => {
-    const response = await axios.post("http://127.0.0.1:5000/items", {
-      name,
-      description,
-      category,
-      appearance,
-      discovered_by,
-      named_by,
-      phase,
-      bohr_model_image,
-      summary,
-    });
-    setItems([...items, response.data]);
-    resetFields();
+    await axios
+      .post("http://127.0.0.1:5000/elements", {
+        name,
+        category,
+        appearance,
+        discovered_by,
+        named_by,
+        phase,
+        bohr_model_image,
+        summary,
+        atomic_number,
+        symbol,
+      })
+      .then((response) => {
+        setItems([...items, response.data]);
+        resetFields();
+      })
+      .catch((error) => {
+        console.error(error.response.data.message);
+      });
   };
 
   const updateItem = async (id) => {
-    const response = await axios.put(`http://127.0.0.1:5000/items/${id}`, {
-      name,
-      description,
-      category,
-      appearance,
-      discovered_by,
-      named_by,
-      phase,
-      bohr_model_image,
-      summary,
-    });
-    console.log(response.data);
-    setItems(items.map((item) => (item.number === id ? response.data : item)));
-    resetFields();
+    await axios
+      .put(`http://127.0.0.1:5000/elements/${id}`, {
+        name,
+        category,
+        appearance,
+        discovered_by,
+        named_by,
+        phase,
+        bohr_model_image,
+        summary,
+        atomic_number,
+        symbol,
+      })
+      .then((response) => {
+        console.log(response.data);
+        setItems(
+          items.map((item) =>
+            item.atomic_number === id ? response.data : item
+          )
+        );
+        resetFields();
+      })
+      .catch((error) => {
+        console.error(error.response.data.message);
+      });
   };
 
   const deleteItem = async (id) => {
-    await axios.delete(`http://127.0.0.1:5000/items/${id}`);
-    setItems(items.filter((item) => item.number !== id));
+    await axios
+      .delete(`http://127.0.0.1:5000/elements/${id}`)
+      .then((response) => {
+        setItems(items.filter((item) => item.atomic_number !== id));
+      })
+      .catch((error) => {
+        console.error(error.response.data.message);
+      });
   };
 
   const handleSubmit = (e) => {
@@ -100,9 +126,9 @@ const ItemList = () => {
   };
 
   const handleEdit = (item) => {
-    setEditId(item.number);
+    setEditId(item.atomic_number);
+    setAtomic_number(item.atomic_number);
     setName(item.name || "");
-    setDescription(item.description || "");
     setCategory(item.category || "");
     setAppearance(item.appearance || "");
     setDiscovered_by(item.discovered_by || "");
@@ -110,6 +136,7 @@ const ItemList = () => {
     setPhase(item.phase || "");
     setbohr_model_image(item.bohr_model_image || "");
     setSummary(item.summary || "");
+    setSymbol(item.symbol || "");
   };
 
   return (
@@ -129,9 +156,16 @@ const ItemList = () => {
           <TextField
             fullWidth
             margin="normal"
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            label="Symbol"
+            value={symbol}
+            onChange={(e) => setSymbol(e.target.value)}
+          />
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Atomic Number"
+            value={atomic_number}
+            onChange={(e) => setAtomic_number(e.target.value)}
           />
           <TextField
             fullWidth
@@ -194,36 +228,38 @@ const ItemList = () => {
         <Button onClick={resetFields}>Reset selection</Button>
       </Paper>
       <List>
-        {items.map((item) => (
-          <Paper
-            key={item.number}
-            elevation={2}
-            style={{ marginBottom: "10px" }}
-          >
-            <ListItem>
-              <Link to={`/details/${item.number}`}>
-                <ListItemText
-                  primary={item.name}
-                  secondary={item.description}
-                />
-              </Link>
-              <IconButton
-                edge="end"
-                aria-label="edit"
-                onClick={() => handleEdit(item)}
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                edge="end"
-                aria-label="delete"
-                onClick={() => deleteItem(item.number)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </ListItem>
-          </Paper>
-        ))}
+        {items
+          .sort((a, b) => a.atomic_number - b.atomic_number)
+          .map((item) => (
+            <Paper
+              key={item.atomic_number}
+              elevation={2}
+              style={{ marginBottom: "10px" }}
+            >
+              <ListItem>
+                <Link to={`/details/${item.atomic_number}`}>
+                  <ListItemText
+                    primary={item.name}
+                    secondary={item.appearance}
+                  />
+                </Link>
+                <IconButton
+                  edge="end"
+                  aria-label="edit"
+                  onClick={() => handleEdit(item)}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  onClick={() => deleteItem(item.atomic_number)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItem>
+            </Paper>
+          ))}
       </List>
     </Container>
   );
