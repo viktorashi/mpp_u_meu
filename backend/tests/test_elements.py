@@ -11,17 +11,17 @@ from app.db import get_db
 
 
 
-def test_get_items(client):
+def test_get_elements(client):
     response = client.get('/elements')
     assert response.status_code == 200
     data = json.loads(response.data)
     con = sqlite3.connect('instance/app.sqlite')
     cur = con.cursor()
     cur.execute("SELECT * FROM elements")
-    items = cur.fetchall()
-    assert len(data) == len(items)
+    elements = cur.fetchall()
+    assert len(data) == len(elements)
 
-def test_get_item(client):
+def test_get_element(client):
     response = client.get('/details/1')
     assert response.status_code == 200
     data = json.loads(response.data)
@@ -29,7 +29,7 @@ def test_get_item(client):
 
 
 
-def test_update_item(client):
+def test_update_element(client):
     data= { 'atomic_number' : 6969, 'name': 'mortii masii', 'symbol' : 'H',  'category': 'diatomic nonmetal', 'appearance': 'colorless gas', 'discovered_by': 'Henry Cavendish', 'named_by': 'Antoine Lavoisier', 'phase': 'Gas', 'bohr_model_image': 'https://storage.googleapis.com/search-ar-edu/periodic-table/element_001_hydrogen/element_001_hydrogen_srp_th.png', 'summary': 'Hydrogen is a chemical element with chemical symbol H and atomic number 1. With an atomic weight of 1.00794 u, hydrogen is the lightest element on the periodic table. Its monatomic form (H) is the most abundant chemical substance in the Universe, constituting roughly 75% of all baryonic mass.'}
 
     old_data = { 'atomic_number' : 1, 'name': 'Hydrogen', 'symbol' : 'H',  'category': 'diatomic nonmetal', 'appearance': 'colorless gas', 'discovered_by': 'Henry Cavendish', 'named_by': 'Antoine Lavoisier', 'phase': 'Gas', 'bohr_model_image': 'https://storage.googleapis.com/search-ar-edu/periodic-table/element_001_hydrogen/element_001_hydrogen_srp_th.png', 'summary': 'Hydrogen is a chemical element with chemical symbol H and atomic number 1. With an atomic weight of 1.00794 u, hydrogen is the lightest element on the periodic table. Its monatomic form (H) is the most abundant chemical substance in the Universe, constituting roughly 75% of all baryonic mass.'}
@@ -57,7 +57,7 @@ def test_update_item(client):
 
 
 
-def test_create_item(client):
+def test_create_element(client):
     tot_proasta_data = {'atomic_number' : 1, 'symbol' : 'lmao','name': 'mortii masii',  'category': 'diatomic nonmetal', 'appearance': 'colorless gas', 'discovered_by': 'Henry Cavendish', 'named_by': 'Antoine Lavoisier', 'phase': 'Gas', 'bohr_model_image': 'https://storage.googleapis.com/search-ar-edu/periodic-table/element_001_hydrogen/element_001_hydrogen_srp_th.png', 'summary': 'Hydrogen is a chemical element with chemical symbol H and atomic number 1. With an atomic weight of 1.00794 u, hydrogen is the lightest element on the periodic table. Its monatomic form (H) is the most abundant chemical substance in the Universe, constituting roughly 75% of all baryonic mass.'}
 
     data_proasta = {'atomic_number' : 200, 'symbol' : 'H','name': 'mortii masii',  'category': 'diatomic nonmetal', 'appearance': 'colorless gas', 'discovered_by': 'Henry Cavendish', 'named_by': 'Antoine Lavoisier', 'phase': 'Gas', 'bohr_model_image': 'https://storage.googleapis.com/search-ar-edu/periodic-table/element_001_hydrogen/element_001_hydrogen_srp_th.png', 'summary': 'Hydrogen is a chemical element with chemical symbol H and atomic number 1. With an atomic weight of 1.00794 u, hydrogen is the lightest element on the periodic table. Its monatomic form (H) is the most abundant chemical substance in the Universe, constituting roughly 75% of all baryonic mass.'}
@@ -88,14 +88,14 @@ def test_create_item(client):
     assert data['name'] == 'mortii masii'
 
 
-    #delete the item
+    #delete the element
     #da nu stiu daca inca merge lmao lol
     response = client.delete('/elements/200')
     assert response.status_code == 204
 
 
 
-def test_delete_item(client):
+def test_delete_element(client):
     response = client.delete('/elements/1')
     assert response.status_code == 204
 

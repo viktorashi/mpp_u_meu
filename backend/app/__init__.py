@@ -6,7 +6,7 @@ import os
 import json
 from .db import get_db
 
-class ItemSchema(Schema):
+class ElementSchema(Schema):
     name = fields.Str(required=True)
     category = fields.Str(required=True)
     atomic_number = fields.Int(required=True)
@@ -18,7 +18,15 @@ class ItemSchema(Schema):
     summary = fields.Str(required=True)
     symbol = fields.Str(required=True)
 
-item_schema = ItemSchema()
+class MoleculeSchema(Schema):
+    id = fields.Int(required=True)
+    formula = fields.Str(required=True)
+    logp = fields.Float(required=True)
+    primary_element_symbol = fields.Str(required=True)
+    primary_element = fields.Int(required=True)
+
+element_schema = ElementSchema()
+molecule_schema = MoleculeSchema()
 
 def create_app(test_config=None):
     # create and configure the app
@@ -44,53 +52,53 @@ def create_app(test_config=None):
         pass
 
     @app.get('/details/<int:atomicnumber>')
-    def get_item(atomicnumber):
+    def get_element(atomicnumber):
         #query db for the element of id 'number' 
         db = get_db()
         cur = db.cursor()
         res = cur.execute(
             "SELECT * FROM elements WHERE atomic_number = ?", (atomicnumber,)
         )
-        item = res.fetchone()
-        if item is None:
-            response = make_response(jsonify({'message': 'Item not found!'}), 404)
+        element = res.fetchone()
+        if element is None:
+            response = make_response(jsonify({'message': 'Element not found!'}), 404)
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
-        response = make_response(item)
+        response = make_response(element)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
     @app.get('/elements') 
-    def get_items():
+    def get_elements():
         db = get_db()
         cur = db.cursor()
         res = cur.execute(
             "SELECT * FROM elements"
         )
-        items = res.fetchall()
-        response = make_response(jsonify(items))
+        elements = res.fetchall()
+        response = make_response(jsonify(elements))
         response.headers.add('Access-Control-Allow-Origin', '*')
         # print(response.data)
         return response
 
     @app.put('/elements/<int:atomicnumber>')
-    def update_item(atomicnumber):
+    def update_element(atomicnumber):
         data = request.get_json()
         print(data)
         try: 
-            item = item_schema.load(data)
+            element = element_schema.load(data)
             db = get_db()
             cur = db.cursor()
             cur.execute("select id from elements where atomic_number = ?", (int(atomicnumber),))
             if cur.fetchone() is None:
-                response = make_response(jsonify({'message': 'Item not found!'}), 404)
+                response = make_response(jsonify({'message': 'Element not found!'}), 404)
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response
             res = cur.execute(
-                "UPDATE elements SET atomic_number = ?, symbol = ?, name = ?, category = ?, appearance = ?, discovered_by = ?, named_by = ?, phase = ?, bohr_model_image = ?, summary = ? WHERE atomic_number = ?", (item['atomic_number'], item['symbol'], item['name'], item['category'], item['appearance'], item['discovered_by'], item['named_by'], item['phase'], item['bohr_model_image'], item['summary'], atomicnumber )
+                "UPDATE elements SET atomic_number = ?, symbol = ?, name = ?, category = ?, appearance = ?, discovered_by = ?, named_by = ?, phase = ?, bohr_model_image = ?, summary = ? WHERE atomic_number = ?", (element['atomic_number'], element['symbol'], element['name'], element['category'], element['appearance'], element['discovered_by'], element['named_by'], element['phase'], element['bohr_model_image'], element['summary'], atomicnumber )
             )
             db.commit()
-            response = make_response(jsonify(item))
+            response = make_response(jsonify(element))
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         #if it's not even in the correct format
@@ -99,30 +107,27 @@ def create_app(test_config=None):
             response = make_response(jsonify({"message": "Wrong format! (maybe you haven't specified atomic number/ symbol)"}), 403)
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
-        except sqlite3.IntegrityError as err:
-            print(err)
-            return make_response(jsonify({"message" : "There's already an element with that symbol/atomic number"}) , 409)
 
 
     @app.post('/elements')
-    def create_item():
+    def create_element():
         data = request.get_json()
         print(data)
         try: 
-            item =  item_schema.load(data)
+            element =  element_schema.load(data)
             #check if there's already one with the same number
             db = get_db()
             cur = db.cursor()
-            cur.execute("SELECT id FROM elements WHERE atomic_number = ?", (item['atomic_number'],))
+            cur.execute("SELECT id FROM elements WHERE atomic_number = ?", (element['atomic_number'],))
             if cur.fetchone() is not None:
                 return make_response(jsonify({'message': 'Atomic no. / symbol already in there!'}), 409)
 
             #add it there then
             cur.execute(
-                "INSERT INTO elements (atomic_number, symbol, name, category, appearance, discovered_by, named_by, phase, bohr_model_image, summary) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)", (item['atomic_number'],item['symbol'], item['name'], item['category'], item['appearance'], item['discovered_by'], item['named_by'], item['phase'], item['bohr_model_image'], item['summary'],)
+                "INSERT INTO elements (atomic_number, symbol, name, category, appearance, discovered_by, named_by, phase, bohr_model_image, summary) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)", (element['atomic_number'],element['symbol'], element['name'], element['category'], element['appearance'], element['discovered_by'], element['named_by'], element['phase'], element['bohr_model_image'], element['summary'],)
             )
             db.commit()
-            response = make_response(jsonify(item), 201)
+            response = make_response(jsonify(element), 201)
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         except ValidationError as err:
@@ -134,13 +139,13 @@ def create_app(test_config=None):
  
 
     @app.delete('/elements/<int:atomicnumber>')
-    def delete_item(atomicnumber):
+    def delete_element(atomicnumber):
         #check if already there or not
         db = get_db()
         cur = db.cursor()
         cur.execute("SELECT id FROM elements WHERE atomic_number = ?", (atomicnumber,))
         if cur.fetchone() is None:
-            response = make_response(jsonify({'message': 'Item not found!'}), 404)
+            response = make_response(jsonify({'message': 'Element not found!'}), 404)
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response 
 
@@ -150,6 +155,118 @@ def create_app(test_config=None):
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
+
+    @app.get('/molecules')
+    def get_all_molecules():
+        db = get_db()
+        cur = db.cursor()
+        res = cur.execute(
+            "SELECT * FROM molecules"
+        )
+        elements = res.fetchall()
+        response = make_response(jsonify(elements))
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
+    @app.get('/molecules/<int:id>') 
+    def get_molecule(id):
+        db = get_db()
+        cur = db.cursor()
+        res = cur.execute(
+            "SELECT * FROM molecules WHERE id = ?", (id,)
+        )
+        element = res.fetchone()
+        if element is None:
+            response = make_response(jsonify({'message': 'Element not found!'}), 404)
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        response = make_response(element)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
+    @app.get('/primarymolecules/<int:atomic_number>')
+    def get_primary_molecules(atomic_number):
+        ''' see for which molecules is this element the primary one, used for the second fetch call in the details page of the element'''
+        db = get_db()
+        cur = db.cursor()
+        res = cur.execute(
+            "SELECT * FROM molecules WHERE primary_element = ?", (atomic_number,)
+        )
+        elements = res.fetchall()
+        if len(elements) == 0:
+            response = make_response(jsonify({'message': 'No such molecules'}), 404)
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        response = make_response(jsonify(elements),201)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
+    '''returns the id of the molecule added'''
+    @app.post('/molecules')
+    def add_molecule():
+        data = request.get_json()
+        print(data)
+        try: 
+            molecule = molecule_schema.load(data)
+            db = get_db()
+            cur = db.cursor()
+            cur.execute("SELECT id FROM molecules WHERE id = ?", (molecule['id'],))
+            if cur.fetchone() is not None:
+                return make_response(jsonify({'message': 'Molecule already in there!'}), 409)
+
+            cur.execute(
+                "INSERT INTO molecules ( formula, logp, primary_element_symbol, primary_element) VALUES ( ?,?, ?, ?)",  (molecule['formula'],molecule['logp'], molecule['primary_element_symbol'], molecule['primary_element'])
+            )
+            db.commit()
+            #get its assigned id
+            cur.execute("SELECT id FROM molecules WHERE formula = ?", (molecule['formula'],))
+            id = cur.fetchone()
+            response = make_response(jsonify(id), 201)
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        except ValidationError as err:
+            print(err)
+            return make_response(jsonify({'message': "Wrong format! there are fields you haven't specified "}), 403)
+
+
+    @app.put('/molecules/<int:id>')
+    def update_molecule(id):
+        data = request.get_json()
+        print(data)
+        try: 
+            molecule = molecule_schema.load(data)
+            db = get_db()
+            cur = db.cursor()
+            cur.execute("SELECT id FROM molecules WHERE id = ?", (id,))
+            if cur.fetchone() is None:
+                return make_response(jsonify({'message': 'Molecule not found!'}), 404)
+
+            cur.execute(
+                "UPDATE molecules SET formula = ?, logp = ?, primary_element_symbol = ?, primary_element = ? WHERE id = ?", (molecule['formula'], molecule['logp'], molecule['primary_element_symbol'], molecule['primary_element'], id)
+            )
+            db.commit()
+            response = make_response(jsonify(data), 200)
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        except ValidationError as err:
+            print(err)
+            return make_response(jsonify({'message': 'Wrong format!'}), 403)
+
+    @app.delete('/molecules/<int:id>')
+    def delete_molecule(id):
+        db = get_db()
+        cur = db.cursor()
+        cur.execute("SELECT id FROM molecules WHERE id = ?", (id,))
+        if cur.fetchone() is None:
+            response = make_response(jsonify({'message': 'Element not found!'}), 404)
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+
+        cur.execute("DELETE FROM molecules WHERE id = ?", (id,))
+        db.commit()
+        response = make_response('', 204)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
     from . import db
     db.init_app(app)

@@ -15,8 +15,8 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const ItemList = () => {
-  const [items, setItems] = useState([]);
+const ElementList = () => {
+  const [elements, setelements] = useState([]);
   const [name, setName] = useState("");
   const [editId, setEditId] = useState(0);
   const [category, setCategory] = useState("");
@@ -30,13 +30,13 @@ const ItemList = () => {
   const [atomic_number, setAtomic_number] = useState(0);
 
   useEffect(() => {
-    fetchItems();
+    fetchelements();
   }, []);
 
-  const fetchItems = async () => {
+  const fetchelements = async () => {
     const response = await axios.get("http://127.0.0.1:5000/elements");
     console.log(response.data);
-    setItems(response.data);
+    setelements(response.data);
   };
 
   const resetFields = () => {
@@ -53,7 +53,7 @@ const ItemList = () => {
     setSymbol("");
   };
 
-  const addItem = async () => {
+  const addelement = async () => {
     await axios
       .post("http://127.0.0.1:5000/elements", {
         name,
@@ -68,7 +68,7 @@ const ItemList = () => {
         symbol,
       })
       .then((response) => {
-        setItems([...items, response.data]);
+        setelements([...elements, response.data]);
         resetFields();
       })
       .catch((error) => {
@@ -76,7 +76,7 @@ const ItemList = () => {
       });
   };
 
-  const updateItem = async (id) => {
+  const updateelement = async (id) => {
     await axios
       .put(`http://127.0.0.1:5000/elements/${id}`, {
         name,
@@ -92,9 +92,9 @@ const ItemList = () => {
       })
       .then((response) => {
         console.log(response.data);
-        setItems(
-          items.map((item) =>
-            item.atomic_number === id ? response.data : item
+        setelements(
+          elements.map((element) =>
+            element.atomic_number === id ? response.data : element
           )
         );
         resetFields();
@@ -104,11 +104,11 @@ const ItemList = () => {
       });
   };
 
-  const deleteItem = async (id) => {
+  const deleteelement = async (id) => {
     await axios
       .delete(`http://127.0.0.1:5000/elements/${id}`)
-      .then((response) => {
-        setItems(items.filter((item) => item.atomic_number !== id));
+      .then(() => {
+        setelements(elements.filter((element) => element.atomic_number !== id));
       })
       .catch((error) => {
         console.error(error.response.data.message);
@@ -119,30 +119,30 @@ const ItemList = () => {
     e.preventDefault();
     console.log(editId);
     if (editId !== 0 && editId !== undefined) {
-      updateItem(editId);
+      updateelement(editId);
     } else {
-      addItem();
+      addelement();
     }
   };
 
-  const handleEdit = (item) => {
-    setEditId(item.atomic_number);
-    setAtomic_number(item.atomic_number);
-    setName(item.name || "");
-    setCategory(item.category || "");
-    setAppearance(item.appearance || "");
-    setDiscovered_by(item.discovered_by || "");
-    setNamed_by(item.named_by || "");
-    setPhase(item.phase || "");
-    setbohr_model_image(item.bohr_model_image || "");
-    setSummary(item.summary || "");
-    setSymbol(item.symbol || "");
+  const handleEdit = (element) => {
+    setEditId(element.atomic_number);
+    setAtomic_number(element.atomic_number);
+    setName(element.name || "");
+    setCategory(element.category || "");
+    setAppearance(element.appearance || "");
+    setDiscovered_by(element.discovered_by || "");
+    setNamed_by(element.named_by || "");
+    setPhase(element.phase || "");
+    setbohr_model_image(element.bohr_model_image || "");
+    setSummary(element.summary || "");
+    setSymbol(element.symbol || "");
   };
 
   return (
     <Container maxWidth="md">
       <Typography variant="h4" component="h1" gutterBottom>
-        Item List
+        Elements List
       </Typography>
       <Paper elevation={3} style={{ padding: "20px", marginBottom: "20px" }}>
         <form onSubmit={handleSubmit}>
@@ -228,32 +228,32 @@ const ItemList = () => {
         <Button onClick={resetFields}>Reset selection</Button>
       </Paper>
       <List>
-        {items
+        {elements
           .sort((a, b) => a.atomic_number - b.atomic_number)
-          .map((item) => (
+          .map((element) => (
             <Paper
-              key={item.atomic_number}
+              key={element.atomic_number}
               elevation={2}
               style={{ marginBottom: "10px" }}
             >
               <ListItem>
-                <Link to={`/details/${item.atomic_number}`}>
+                <Link to={`/details/${element.atomic_number}`}>
                   <ListItemText
-                    primary={item.name}
-                    secondary={item.appearance}
+                    primary={element.name}
+                    secondary={element.appearance}
                   />
                 </Link>
                 <IconButton
                   edge="end"
                   aria-label="edit"
-                  onClick={() => handleEdit(item)}
+                  onClick={() => handleEdit(element)}
                 >
                   <EditIcon />
                 </IconButton>
                 <IconButton
                   edge="end"
                   aria-label="delete"
-                  onClick={() => deleteItem(item.atomic_number)}
+                  onClick={() => deleteelement(element.atomic_number)}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -265,4 +265,4 @@ const ItemList = () => {
   );
 };
 
-export default ItemList;
+export default ElementList;
