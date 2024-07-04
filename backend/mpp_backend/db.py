@@ -30,7 +30,7 @@ def init_db():
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
 
-    elements = json.load(open('app/static/periodic-table.json','r'))
+    elements = json.load(open('mpp_backend/static/periodic-table.json','r'))
     cur  = db.cursor()
     try:
         cur.executemany(
@@ -41,7 +41,7 @@ def init_db():
     except Exception as e:
         click.echo(e)
 
-    with open('app/static/molecules.csv', 'r') as file:
+    with open('mpp_backend/static/molecules.csv', 'r') as file:
         molecules = csv.reader(file, delimiter=',')
         try:
             cur.executemany( "INSERT INTO molecules (formula, logp, primary_element_symbol, primary_element) VALUES (?,?,?,?)",  molecules)

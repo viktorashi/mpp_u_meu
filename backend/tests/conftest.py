@@ -1,5 +1,5 @@
 import pytest
-from app import create_app
+from mpp_backend import create_app
 
 @pytest.fixture()
 def app():

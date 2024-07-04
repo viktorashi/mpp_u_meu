@@ -21,7 +21,7 @@ CREATE TABLE molecules (
   logp FLOAT,
   primary_element_symbol VARCHAR ,
   primary_element INTEGER ,
-  FOREIGN KEY (primary_element) REFERENCES elements(id)
+  FOREIGN KEY (primary_element) REFERENCES elements(atomic_number)
 );
 
 
