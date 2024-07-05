@@ -35,9 +35,6 @@ def test_add_molecule(client):
     id  = json.loads(response.data)['id'] 
     assert json.loads( client.get('/molecules/'+str(id)).data)['formula'] == 'KaKaMaKa'
 
-    #delete it after
-    response = client.delete('/molecules/'+str(id))
-
     already_in_there = {'formula': 'C[C@H]([C@@H](C)Cl)Cl', 'logp' : 2.3, 'primary_element_symbol' : 'C', 'primary_element' : 6 , 'id': 1}
     response = client.post('/molecules', json=already_in_there)
     assert response.status_code == 409
@@ -61,10 +58,6 @@ def test_update_molecule(client):
     data = {'sa moara':'franta'}
     response = client.put('/molecules/1', json=data)
     assert response.status_code == 403
-
-    #put it back like it was
-    response = client.put('/molecules/1', json=old_data)
-    assert response.status_code == 200
 
     not_found = {'formula': 'C[C@H]([C@@H](C)Cl)Cl', 'logp' : 69, 'primary_element_symbol' : 'C', 'primary_element' : 6 , 'id': 999}
     response = client.put('/molecules/999', json=not_found)
