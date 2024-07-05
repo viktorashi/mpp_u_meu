@@ -3,11 +3,12 @@ import sqlite3
 from mpp_backend import create_app
 from mpp_backend.db import get_db
 
-def test_get_elements(client):
+def test_get_elements(client, app):
     response = client.get('/elements')
     assert response.status_code == 200
     data = json.loads(response.data)
-    con = sqlite3.connect('instance/mpp_backend.sqlite')
+    #get the temp one used for testing gen ca sa nu ia ia care chiar era legit ca inainte
+    con = sqlite3.connect(app.config['DATABASE'])
     cur = con.cursor()
     cur.execute("SELECT * FROM elements")
     elements = cur.fetchall()

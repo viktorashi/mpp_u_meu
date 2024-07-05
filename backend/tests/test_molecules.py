@@ -1,14 +1,14 @@
 import json
 import sqlite3
 from mpp_backend import create_app
-from mpp_backend    .db import get_db
+from mpp_backend.db import get_db
 
 
-def test_get_all_molecules(client):
+def test_get_all_molecules(client, app):
     response = client.get('/molecules')
     assert response.status_code == 200
     data = json.loads(response.data)
-    con = sqlite3.connect('instance/mpp_backend.sqlite')
+    con = sqlite3.connect(app.config['DATABASE'])
     cur = con.cursor()
     cur.execute("SELECT * FROM molecules")
     items = cur.fetchall()
