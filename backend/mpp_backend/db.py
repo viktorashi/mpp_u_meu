@@ -30,25 +30,27 @@ def init_db():
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
 
-    elements = json.load(open('mpp_backend/static/periodic-table.json','r'))
-    cur  = db.cursor()
-    try:
-        cur.executemany(
-            "INSERT INTO elements (name, category, atomic_number, appearance, discovered_by, named_by, phase, bohr_model_image, summary, symbol) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            elements
-        )
-        db.commit()
-    except Exception as e:
-        click.echo(e)
+    # elements = json.load(open('mpp_backend/static/periodic-table.json','r'))
+    with current_app.open_resource('static/periodic-table.json') as f:
+        elements = json.load(f)
+        cur  = db.cursor()
+        try:
+            cur.executemany(
+                "INSERT INTO elements (name, category, atomic_number, appearance, discovered_by, named_by, phase, bohr_model_image, summary, symbol) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                elements
+            )
+            db.commit()
+        except Exception as e:
+            click.echo(e)
 
-    with open('mpp_backend/static/molecules.csv', 'r') as file:
-        molecules = csv.reader(file, delimiter=',')
+    #   yeysyesyey   YESSS DOAMNE CAT AM STAT LA KKT UASTA TREBUIA DOAR SA ZIC CA CE FEL DE FISIER SA -L DESCHICA U R IN LOC DE RB SAU CVC BRHGBH4GHEGRE
+    with current_app.open_resource('static/molecules.csv', 'r') as file:
+        molecules = csv.reader(file)
         try:
             cur.executemany( "INSERT INTO molecules (formula, logp, primary_element_symbol, primary_element) VALUES (?,?,?,?)",  molecules)
             db.commit()
         except Exception as e:
             click.echo(e)
-
     cur.close()
 
 @click.command('init-db')

@@ -13,7 +13,7 @@ const Molecule = () => {
         const fetchMoleculeDetails = async () => {
             const response = await axios.get(`http://127.0.0.1:5000/molecules/${id}`);
             setMolecule(response.data);
-            const primaryElementResponse = await axios.get(`http://127.0.0.1:5000/details/${response.data.primary_element}`);
+            const primaryElementResponse = await axios.get(`http://127.0.0.1:5000/elements/${response.data.primary_element}`);
             setPrimaryElement(primaryElementResponse.data);
         }
         fetchMoleculeDetails()
@@ -62,7 +62,7 @@ const Molecule = () => {
                 Phase
             </Typography>
             <ListItemText primary={primaryElement.phase} />
-            <Link to={`/details/${primaryElement.atomic_number}`}>
+            <Link to={`/elements/${primaryElement.atomic_number}`}>
                 <img src={primaryElement.bohr_model_image} alt="Bohr Model" />
             </Link>
 

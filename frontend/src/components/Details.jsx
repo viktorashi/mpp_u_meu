@@ -13,10 +13,10 @@ function DetailsPage() {
   useEffect(() => {
 
     const fetchDetails = async () => {
-      await axios.get(`http://127.0.0.1:5000/details/${number}`).then((response) => setDetails(response.data)).catch((error) => console.error("Error fetching data:", error));
+      await axios.get(`http://127.0.0.1:5000/elements/${number}`).then((response) => setDetails(response.data)).catch((error) => console.error("Error fetching data:", error));
 
       // Fetch molecules that have the current element as their primary element
-      await axios.get(`http://127.0.0.1:5000/primarymolecules/${number}`).then((response) => {
+      await axios.get(`http://127.0.0.1:5000/molecules/primary/${number}`).then((response) => {
         setPrimaryMolecules(response.data)
       }).catch((error) => {
         setStatusCode(error.response.status);

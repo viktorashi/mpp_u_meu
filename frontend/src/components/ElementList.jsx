@@ -237,7 +237,7 @@ const ElementList = () => {
               style={{ marginBottom: "10px" }}
             >
               <ListItem>
-                <Link to={`/details/${element.atomic_number}`}>
+                <Link to={`/elements/${element.atomic_number}`}>
                   <ListItemText
                     primary={element.name}
                     secondary={element.appearance}
