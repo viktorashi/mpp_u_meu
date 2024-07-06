@@ -1,6 +1,7 @@
 import json
 import sqlite3
 from mpp_backend import create_app
+import click
 from mpp_backend.db import get_db
 
 def test_get_elements(client, app):
@@ -8,16 +9,14 @@ def test_get_elements(client, app):
     assert response.status_code == 200
     data = json.loads(response.data)
     #get the temp one used for testing gen ca sa nu ia ia care chiar era legit ca inainte
-    con = sqlite3.connect(app.config['DATABASE'])
-    cur = con.cursor()
-    cur.execute("SELECT * FROM elements")
-    elements = cur.fetchall()
-    assert len(data) == len(elements)
+    with app.app_context():
+        assert get_db().execute('SELECT * FROM elements').fetchall() == data    
 
 def test_get_element(client):
-    response = client.get('/details/1')
+    response = client.get('/elements/1')
     assert response.status_code == 200
     data = json.loads(response.data)
+    print(data)
     assert data['name'] == "Hydrogen"
 
 
@@ -29,12 +28,14 @@ def test_update_element(client):
 
     #try updateing an id that doesnt exist
     response = client.put('/elements/999', json=data)
+    print (response.data)
     assert response.status_code == 404
 
     response = client.put('/elements/1', json=data)
+    print (response.data)
     assert response.status_code == 200
 
-    response = client.get('/details/6969')
+    response = client.get('/elements/6969')
     data = json.loads(response.data)
     assert data['name'] == 'mortii masii'
 
@@ -55,6 +56,7 @@ def test_create_element(client):
 
     #asta nu mere ca e deja unu cu numaru 1
     response = client.post('/elements', json=tot_proasta_data)
+    print(response.data)
     assert response.status_code == 409
 
     #asta nu mere ca nu e unic simbolu
@@ -70,7 +72,7 @@ def test_create_element(client):
     response = client.post('/elements', json=good_data)
     assert response.status_code == 201
 
-    response = client.get('/details/200')
+    response = client.get('/elements/200')
     data = json.loads(response.data)
     print(data)
     print(response.status_code)
@@ -82,7 +84,7 @@ def test_delete_element(client):
     response = client.delete('/elements/1')
     assert response.status_code == 204
 
-    response = client.get('/details/1')
+    response = client.get('/elements/1')
     assert response.status_code == 404
 
     response = client.delete('/elements/1')

@@ -19,7 +19,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Navigate replace to="/elements" />} />
-          <Route path="/details/:number" element={<Details />} />
+          <Route path="/elements/:number" element={<Details />} />
           <Route path="/elements" element={<ElementList />} />
           <Route path="/molecules" element={<Molecules />} />
           <Route path="/molecules/:id" element={<Molecule />} />

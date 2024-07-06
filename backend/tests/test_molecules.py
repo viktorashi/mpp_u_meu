@@ -12,20 +12,24 @@ def test_get_all_molecules(client, app):
     cur = con.cursor()
     cur.execute("SELECT * FROM molecules")
     items = cur.fetchall()
+    # print (items)
+    # print (data)
     assert len(data) == len(items)
 
 def test_get_molecule(client):
     response = client.get('/molecules/1')
+    print(client.get('molecules').data)
+    print(response.data)
     assert response.status_code == 200
     data = json.loads(response.data)
     assert data['formula'] == "C[C@H]([C@@H](C)Cl)Cl"
 
 def test_get_primary_molecules(client):
-    response = client.get('/primarymolecules/1')
+    response = client.get('/molecules/primary/1')
     assert response.status_code == 201
     assert len(json.loads(response.data)) == 6
 
-    response = client.get('/primarymolecules/119')
+    response = client.get('/molecules/primary/119')
     assert response.status_code == 404
 
 def test_add_molecule(client):

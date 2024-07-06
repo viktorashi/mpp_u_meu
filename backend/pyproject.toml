@@ -1,0 +1,9 @@
+[project]
+name = "mpp_backend"
+version = "1.0.0"
+description = "kktu asta ca nu mai suport sa termin drq mai rpd"
+dependencies = ["flask", "click", "marshmallow", "flask_cors" ]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
