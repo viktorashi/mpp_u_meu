@@ -15,7 +15,8 @@ const Molecules = () => {
     const [primary_element, setprimary_element] = useState(0);
 
     const fetchMolecules = async () => {
-        const response = await axios.get('http://127.0.0.1:5000/molecules');
+        const response = await axios.get('/molecules');
+        console.log(response.data);
         setMolecules(response.data);
     }
 
@@ -32,7 +33,7 @@ const Molecules = () => {
     };
 
     const addMolecule = async () => {
-        await axios.post(`http://127.0.0.1:5000/molecules`, {
+        await axios.post(`/molecules`, {
             id,
             formula,
             logp,
@@ -45,19 +46,20 @@ const Molecules = () => {
     }
 
     const updateMolecule = async () => {
-        await axios.put(`http://127.0.0.1:5000/molecules/${id}`, {
+        await axios.put(`/molecules/${id}`, {
             formula,
             logp,
             primary_element_symbol,
             primary_element
         }).then((response) => {
             setMolecules(molecules.map((molecule) => molecule.id === id ? response.data : molecule));
+            console.log(response.data)
             resetFields();
         }).catch((error) => console.error(error.response.data.message));
     }
 
     const deleteMolecule = async (id) => {
-        await axios.delete(`http://127.0.0.1:5000/molecules/${id}`).then(() => {
+        await axios.delete(`/molecules/${id}`).then(() => {
             setMolecules(molecules.filter((molecule) => molecule.id !== id));
         }).catch((error) => console.error(error.response.data.message));
     }

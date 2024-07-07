@@ -11,9 +11,9 @@ const Molecule = () => {
 
     useEffect(() => {
         const fetchMoleculeDetails = async () => {
-            const response = await axios.get(`http://127.0.0.1:5000/molecules/${id}`);
+            const response = await axios.get(`/molecules/${id}`);
             setMolecule(response.data);
-            const primaryElementResponse = await axios.get(`http://127.0.0.1:5000/elements/${response.data.primary_element}`);
+            const primaryElementResponse = await axios.get(`/elements/${response.data.primary_element}`);
             setPrimaryElement(primaryElementResponse.data);
         }
         fetchMoleculeDetails()

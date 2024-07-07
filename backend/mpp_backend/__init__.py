@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, make_response
+from werkzeug.middleware.proxy_fix import ProxyFix
 import sqlite3
 from flask_cors import CORS
 import os
@@ -38,5 +39,9 @@ def create_app(test_config=None):
     from . import molecules
     app.register_blueprint(elements.bp)
     app.register_blueprint(molecules.bp)
+
+#     app.wsgi_app = ProxyFix(
+#     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+# )
     
     return app

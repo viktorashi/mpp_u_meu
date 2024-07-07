@@ -34,7 +34,7 @@ const ElementList = () => {
   }, []);
 
   const fetchelements = async () => {
-    const response = await axios.get("http://127.0.0.1:5000/elements");
+    const response = await axios.get("/elements");
     console.log(response.data);
     setelements(response.data);
   };
@@ -55,7 +55,7 @@ const ElementList = () => {
 
   const addelement = async () => {
     await axios
-      .post("http://127.0.0.1:5000/elements", {
+      .post("/elements", {
         name,
         category,
         appearance,
@@ -78,7 +78,7 @@ const ElementList = () => {
 
   const updateelement = async (id) => {
     await axios
-      .put(`http://127.0.0.1:5000/elements/${id}`, {
+      .put(`/elements/${id}`, {
         name,
         category,
         appearance,
@@ -106,7 +106,7 @@ const ElementList = () => {
 
   const deleteelement = async (id) => {
     await axios
-      .delete(`http://127.0.0.1:5000/elements/${id}`)
+      .delete(`/elements/${id}`)
       .then(() => {
         setelements(elements.filter((element) => element.atomic_number !== id));
       })
