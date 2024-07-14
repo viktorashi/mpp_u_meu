@@ -1,1 +1,1 @@
-web: gunicorn app:backend/mpp_backend
+web: gunicorn mpp_backend:app

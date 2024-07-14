@@ -8,7 +8,7 @@ from .db import get_db, init_app
 
 def create_app(test_config=None):
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True, static_folder='../../frontend/build/')
+    app = Flask(__name__, instance_relative_config=True, static_folder='../frontend/build/')
     CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE"]}})
 
     app.config.from_mapping(
@@ -45,6 +45,8 @@ def create_app(test_config=None):
     app.register_blueprint(molecules.bp)
 
     return app
+
+app = create_app()
 
 
 if __name__ == "__main__":
