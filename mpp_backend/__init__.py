@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, make_response
 from werkzeug.middleware.proxy_fix import ProxyFix
 import sqlite3
 from flask_cors import CORS, cross_origin
+from flask.helpers import send_from_directory
 import os
 import json
 from .db import get_db, init_app
@@ -34,7 +35,16 @@ def create_app(test_config=None):
     @app.route('/')
     @cross_origin()
     def index():
-        return app.send_static_file('index.html')
+        return send_from_directory(app.static_folder,'index.html')
+
+    @app.route('/static/<path:path>')
+    def static_files(path):
+        return send_from_directory(os.path.join(app.static_folder, 'static'), path)
+
+    @app.errorhandler(404)
+    @cross_origin()
+    def not_found(e):
+        return send_from_directory(app.static_folder, 'index.html')
 
     # from . import db
     init_app(app)
