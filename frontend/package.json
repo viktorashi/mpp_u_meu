@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://127.0.0.1:5000", 
+  "proxy": "https://voyage-maison-11239-299b3d70b8cf.herokuapp.com", 
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
     "@mui/icons-material": "^5.15.21",
