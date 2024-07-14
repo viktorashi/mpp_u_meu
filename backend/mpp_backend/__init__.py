@@ -1,14 +1,14 @@
 from flask import Flask, request, jsonify, make_response
 from werkzeug.middleware.proxy_fix import ProxyFix
 import sqlite3
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import os
 import json
-from .db import get_db
+from .db import get_db, init_app
 
 def create_app(test_config=None):
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True, static_folder='../../frontend/build/')
     CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE"]}})
 
     app.config.from_mapping(
@@ -31,17 +31,22 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    @app.route('/')
+    @cross_origin()
+    def index():
+        return app.send_static_file('index.html')
 
-    from . import db
-    db.init_app(app)
+    # from . import db
+    init_app(app)
 
     from . import elements
     from . import molecules
     app.register_blueprint(elements.bp)
     app.register_blueprint(molecules.bp)
 
-#     app.wsgi_app = ProxyFix(
-#     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
-# )
-    
     return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run()

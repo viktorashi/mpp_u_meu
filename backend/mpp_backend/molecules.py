@@ -2,6 +2,7 @@ from flask import Blueprint, make_response, jsonify, request
 import sqlite3
 from marshmallow import Schema, fields, ValidationError
 from .db import get_db
+from flask_cors import cross_origin
 
 bp = Blueprint('molecules', __name__, url_prefix='/molecules')
 
@@ -15,6 +16,7 @@ class MoleculeSchema(Schema):
 molecule_schema = MoleculeSchema()
 
 @bp.get('')
+@cross_origin()
 def get_all_molecules():
     db = get_db()
     cur = db.cursor()
@@ -27,6 +29,7 @@ def get_all_molecules():
     return response
 
 @bp.get('/<int:id>') 
+@cross_origin()
 def get_molecule(id):
     db = get_db()
     cur = db.cursor()
@@ -43,11 +46,12 @@ def get_molecule(id):
     return response
 
 @bp.get('/primary/<int:atomic_number>')
+@cross_origin()
 def get_primary_molecules(atomic_number : int):
     ''' see for which molecules is this element the primary one, used for the second fetch call in the details page of the element'''
     db = get_db()
     cur = db.cursor()
-    print('asta inaitne')
+    # print('asta inaitne')
     try:
         res = cur.execute(
             "SELECT * FROM molecules WHERE primary_element = ?", [atomic_number]
@@ -70,6 +74,7 @@ def get_primary_molecules(atomic_number : int):
 
 '''returns the id of the molecule added'''
 @bp.post('')
+@cross_origin()
 def add_molecule():
     data = request.get_json()
     print(data)
@@ -97,6 +102,7 @@ def add_molecule():
 
 
 @bp.put('/<int:id>')
+@cross_origin()
 def update_molecule(id):
     data = request.get_json()
     print(data)
@@ -120,6 +126,7 @@ def update_molecule(id):
         return make_response(jsonify({'message': 'Wrong format!'}), 403)
 
 @bp.delete('/<int:id>')
+@cross_origin()
 def delete_molecule(id):
     db = get_db()
     cur = db.cursor()

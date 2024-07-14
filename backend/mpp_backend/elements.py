@@ -2,6 +2,7 @@ from flask import Blueprint, make_response, jsonify, request
 import sqlite3
 from marshmallow import Schema, fields, ValidationError
 from .db import get_db
+from flask_cors import cross_origin
 
 bp = Blueprint('elements', __name__, url_prefix='/elements')
 
@@ -21,6 +22,7 @@ element_schema = ElementSchema()
 
 #get all elements
 @bp.get('')
+@cross_origin()
 def get_elements():
     db = get_db()
     cur = db.cursor()
@@ -34,6 +36,7 @@ def get_elements():
     return response
 
 @bp.get('/<int:atomicnumber>')
+@cross_origin()
 def get_element(atomicnumber):
     db = get_db()
     cur = db.cursor()
@@ -50,6 +53,7 @@ def get_element(atomicnumber):
     return response
 
 @bp.put('/<int:atomicnumber>')
+@cross_origin()
 def update_element(atomicnumber):
     data = request.get_json()
     print(data)
@@ -77,8 +81,8 @@ def update_element(atomicnumber):
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
-
 @bp.post('')
+@cross_origin()
 def create_element():
     data = request.get_json()
     print(data)
@@ -108,6 +112,7 @@ def create_element():
 
 
 @bp.delete('/<int:atomicnumber>')
+@cross_origin()
 def delete_element(atomicnumber):
     #check if already there or not
     db = get_db()
